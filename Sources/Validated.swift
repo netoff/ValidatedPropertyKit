@@ -116,6 +116,8 @@ public struct Validated<Value: Optionalable> {
     /// The Validation
     let validation: Validation<Value.Wrapped>
     
+    private var rawValue: Value?
+    
     /// The validated value
     public private(set) var validatedValue: Result<Value.Wrapped, ValidationError> {
         didSet {
@@ -124,6 +126,7 @@ public struct Validated<Value: Optionalable> {
             case .success(let value):
                 // If success store value to last successful validated value
                 self.lastSuccessfulValidatedValue = value
+                self.rawValue = value as? Value
             case .failure:
                 // In failure case return
                 return
@@ -133,7 +136,7 @@ public struct Validated<Value: Optionalable> {
     
     /// Bool if the current value is valid
     public var isValid: Bool {
-        return self.wrappedValue.wrapped != nil
+        return self.validationError == nil
     }
     
     /// The current ValidationError
@@ -170,6 +173,7 @@ public struct Validated<Value: Optionalable> {
                 _ validation: Validation<Value.Wrapped>) {
         self.init(validation)
         self.wrappedValue = initialValue
+        self.rawValue = initialValue
     }
     
     // MARK: Value
@@ -179,17 +183,10 @@ public struct Validated<Value: Optionalable> {
         set {
             // Set validated value by validating the new value
             self.validatedValue = self.isValid(value: newValue)
+            self.rawValue = newValue
         }
         get {
-            // Switch on validated value
-            switch self.validatedValue {
-            case .success(let value):
-                // Return value
-                return .init(value)
-            case .failure:
-                // Return nil
-                return nil
-            }
+            self.rawValue ?? nil
         }
     }
     

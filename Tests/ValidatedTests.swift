@@ -31,7 +31,7 @@ class ValidatedTests: XCTestCase {
         XCTAssertEqual(validValue, validated.wrappedValue)
         XCTAssert(validated.isValid)
         validated.wrappedValue = invalidValue
-        XCTAssertNil(validated.wrappedValue)
+        XCTAssertEqual(invalidValue, validated.wrappedValue)
         XCTAssertFalse(validated.isValid)
         XCTAssertEqual(validValue, validated.lastSuccessfulValidatedValue)
         validated.restore()
