@@ -2,10 +2,10 @@ Pod::Spec.new do |s|
   s.name                      = "ValidatedPropertyKit"
   s.version                   = "0.0.3"
   s.summary                   = "ValidatedPropertyKit"
-  s.homepage                  = "https://SvenTiigi@github.com/SvenTiigi/ValidatedPropertyKit"
+  s.homepage                  = "https://github.com/netoff/ValidatedPropertyKit.git"
   s.license                   = { :type => "MIT", :file => "LICENSE" }
   s.author                    = { "Sven Tiigi" => "sven.tiigi@gmail.com" }
-  s.source                    = { :git => "https://github.com/SvenTiigi/ValidatedPropertyKit.git", :tag => s.version.to_s }
+  s.source                    = { :git => "https://github.com/netoff/ValidatedPropertyKit.git", :tag => s.version.to_s }
   s.swift_version             = "5.1"
   s.ios.deployment_target     = "8.0"
   s.tvos.deployment_target    = "9.0"
