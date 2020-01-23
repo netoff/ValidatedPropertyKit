@@ -167,13 +167,13 @@ public struct Validated<Value> {
     
     /// Designated Initializer
     ///
-    /// - Parameter initialValue: The initial Value
+    /// - Parameter wrappedValue: The initial Value
     /// - Parameter validation: The Validation
-    public init(initialValue: Value,
+    public init(wrappedValue: Value,
                 _ validation: Validation<Value>) {
         self.validation = validation
-        self.rawValue = initialValue
-        self.validatedValue = self.validation.isValid(value: initialValue).map {initialValue}
+        self.rawValue = wrappedValue
+        self.validatedValue = self.validation.isValid(value: wrappedValue).map {wrappedValue}
     }
     
     // MARK: Value
@@ -188,6 +188,11 @@ public struct Validated<Value> {
         get {
             self.rawValue 
         }
+    }
+    
+    public var projectedValue: Self {
+        get {self}
+        set {self = newValue}
     }
     
 }

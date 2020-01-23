@@ -10,6 +10,15 @@
 import XCTest
 
 class ValidatedTests: XCTestCase {
+    struct TestStruct {
+        @Validated(.init { value in
+            if value == 1 {
+                return .success(())
+            } else {
+                return .failure("")
+            }
+        }) public var validated  = 0
+    }
     
     static var allTests = [
         ("testValidated", testValidated)
@@ -18,26 +27,20 @@ class ValidatedTests: XCTestCase {
     func testValidated() {
         let validValue = 1
         let invalidValue = 0
-        var validated = Validated<Int>(initialValue: 0, .init { value in
-            if value == validValue {
-                return .success(())
-            } else {
-                return .failure("")
-            }
-        })
-//        XCTAssertNil(validated.restore())
-        XCTAssertEqual(validated.wrappedValue, invalidValue)
-        validated.wrappedValue = validValue
-        XCTAssertEqual(validValue, validated.wrappedValue)
-        XCTAssert(validated.isValid)
-        validated.wrappedValue = invalidValue
-        XCTAssertEqual(invalidValue, validated.wrappedValue)
-        XCTAssertFalse(validated.isValid)
-        XCTAssertEqual(validValue, validated.lastSuccessfulValidatedValue)
-        validated.restore()
-        XCTAssertEqual(validValue, validated.wrappedValue)
-//        validated.wrappedValue = nil
-//        XCTAssertNil(validated.wrappedValue)
+        
+        var testStruct = TestStruct()
+        
+        XCTAssertNil(testStruct.$validated.restore())
+        XCTAssertEqual(testStruct.validated, invalidValue)
+        testStruct.validated = validValue
+        XCTAssertEqual(validValue, testStruct.validated)
+        XCTAssert(testStruct.$validated.isValid)
+        testStruct.validated = invalidValue
+        XCTAssertEqual(invalidValue, testStruct.validated)
+        XCTAssertFalse(testStruct.$validated.isValid)
+        XCTAssertEqual(validValue, testStruct.$validated.lastSuccessfulValidatedValue)
+        testStruct.$validated.restore()
+        XCTAssertEqual(validValue, testStruct.validated)
     }
     
 }
