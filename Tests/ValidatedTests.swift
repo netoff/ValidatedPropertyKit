@@ -18,15 +18,15 @@ class ValidatedTests: XCTestCase {
     func testValidated() {
         let validValue = 1
         let invalidValue = 0
-        var validated = Validated<Int?>(.init { value in
+        var validated = Validated<Int>(initialValue: 0, .init { value in
             if value == validValue {
                 return .success(())
             } else {
                 return .failure("")
             }
         })
-        XCTAssertNil(validated.restore())
-        XCTAssertNil(validated.wrappedValue)
+//        XCTAssertNil(validated.restore())
+        XCTAssertEqual(validated.wrappedValue, invalidValue)
         validated.wrappedValue = validValue
         XCTAssertEqual(validValue, validated.wrappedValue)
         XCTAssert(validated.isValid)
@@ -36,8 +36,8 @@ class ValidatedTests: XCTestCase {
         XCTAssertEqual(validValue, validated.lastSuccessfulValidatedValue)
         validated.restore()
         XCTAssertEqual(validValue, validated.wrappedValue)
-        validated.wrappedValue = nil
-        XCTAssertNil(validated.wrappedValue)
+//        validated.wrappedValue = nil
+//        XCTAssertNil(validated.wrappedValue)
     }
     
 }

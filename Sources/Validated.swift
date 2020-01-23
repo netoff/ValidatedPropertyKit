@@ -109,24 +109,24 @@ import Foundation
  ```
  */
 @propertyWrapper
-public struct Validated<Value: Optionalable> {
+public struct Validated<Value> {
     
     // MARK: Properties
     
     /// The Validation
-    let validation: Validation<Value.Wrapped>
+    let validation: Validation<Value>
     
-    private var rawValue: Value?
+    private var rawValue: Value
     
     /// The validated value
-    public private(set) var validatedValue: Result<Value.Wrapped, ValidationError> {
+    public private(set) var validatedValue: Result<Value, ValidationError> {
         didSet {
             // Switch on validated value
             switch self.validatedValue {
             case .success(let value):
                 // If success store value to last successful validated value
                 self.lastSuccessfulValidatedValue = value
-                self.rawValue = value as? Value
+                self.rawValue = value
             case .failure:
                 // In failure case return
                 return
@@ -153,27 +153,27 @@ public struct Validated<Value: Optionalable> {
     }
     
     /// The last successful validated Value
-    var lastSuccessfulValidatedValue: Value.Wrapped?
+    var lastSuccessfulValidatedValue: Value?
     
     // MARK: Initializer
     
     /// Designated Initializer
     ///
     /// - Parameter validation: The Validation
-    public init(_ validation: Validation<Value.Wrapped>) {
-        self.validation = validation
-        self.validatedValue = .failure(.nilError)
-    }
+//    public init(_ validation: Validation<Value.Wrapped>) {
+//        self.validation = validation
+//        self.validatedValue = .failure(.nilError)
+//    }
     
     /// Designated Initializer
     ///
     /// - Parameter initialValue: The initial Value
     /// - Parameter validation: The Validation
     public init(initialValue: Value,
-                _ validation: Validation<Value.Wrapped>) {
-        self.init(validation)
-        self.wrappedValue = initialValue
+                _ validation: Validation<Value>) {
+        self.validation = validation
         self.rawValue = initialValue
+        self.validatedValue = self.validation.isValid(value: initialValue).map {initialValue}
     }
     
     // MARK: Value
@@ -186,7 +186,7 @@ public struct Validated<Value: Optionalable> {
             self.rawValue = newValue
         }
         get {
-            self.rawValue ?? nil
+            self.rawValue 
         }
     }
     
@@ -200,14 +200,9 @@ extension Validated: Validatable {
     ///
     /// - Parameter value: The Value that should be validated
     /// - Returns: A Result if the validation succeeded or failed
-    public func isValid(value: Value) -> Result<Value.Wrapped, ValidationError> {
-        // Verify wrapped value is available
-        guard let wrappedValue = value.wrapped else {
-            // Wrapped value is not available return failure with nil error
-            return .failure(.nilError)
-        }
+    public func isValid(value: Value) -> Result<Value, ValidationError> {
         // Return value validation result
-        return self.validation.isValid(value: wrappedValue).map { wrappedValue }
+        return self.validation.isValid(value: value).map { value }
     }
     
 }
@@ -220,16 +215,16 @@ public extension Validated {
     ///
     /// - Returns: The restored value if available
     @discardableResult
-    mutating func restore() -> Value {
+    mutating func restore() -> Value? {
         // Verify last successful validated value is available
-        guard let lastSuccessfulValidatedValue = self.lastSuccessfulValidatedValue else {
+        if let lastSuccessfulValidatedValue = self.lastSuccessfulValidatedValue {
             // The last successful validated value is not available return nil
+            // Set validated value with last successful validated value
+            self.validatedValue = .success(lastSuccessfulValidatedValue)
+            return lastSuccessfulValidatedValue
+        } else {
             return nil
         }
-        // Set validated value with last successful validated value
-        self.validatedValue = .success(lastSuccessfulValidatedValue)
-        // Return value
-        return .init(lastSuccessfulValidatedValue)
     }
     
 }
